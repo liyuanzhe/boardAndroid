@@ -34,15 +34,15 @@ void startlocate(Mat &result,int &startline);
 void counting(Mat &image,int &locate,int &number,int lnum,int padding);
 typedef unsigned char       BYTE;
 
-JNIEXPORT void JNICALL Java_com_example_haveimgfun_LibImgFun_processImg
-   ( JNIEnv * , jobject , jlong addrInRGBA , jlong addrOut ) {
+JNIEXPORT jstring JNICALL Java_com_example_haveimgfun_LibImgFun_processImg
+   ( JNIEnv * env, jobject thiz, jlong addrInRGBA ) {
     
 	//type transform
 	cv :: Mat  image = *(( cv :: Mat * ) addrInRGBA) ;
 	cv::Mat colorImg = image;
 	//cv :: Mat * outputImg = ( cv :: Mat * ) addrOut ;     //img is the output image
 	Mat img;
-     cv::cvtColor(image,img,CV_BGR2GRAY);
+    cv::cvtColor(image,img,CV_BGR2GRAY);
 	 
 	//find Gangban region
 	Mat gbbw;
@@ -81,24 +81,22 @@ JNIEXPORT void JNICALL Java_com_example_haveimgfun_LibImgFun_processImg
 	//calculate the initial vertical counting coordinate 
 	int ystart;
 	startlocate(img,ystart);
-	cout<<ystart<<endl;
+	//cout<<ystart<<endl;
 
-	//Count and show the counting result
+	//Count return the result
 	int num=0;
 	counting(img,ystart,num,3,5);
 	cout<<num<<endl;
 
 	ostringstream ost;
-	ost << num;
+	ost << num <<";" <<ystart<<";";  //count;line;
 	string temp(ost.str());
-	//string txt="The counting number of steel plates is : ";
-	string txt="";
-	txt=txt+temp;
-
-	line(colorImg,Point(ystart,0),Point(ystart,image.rows-1),Scalar (0,128,255),3);  //in BGR  order
-	putText(colorImg, txt, Point(50,50),FONT_HERSHEY_TRIPLEX, 2, Scalar(0,255,180),5);
 	
-	*((Mat*) addrOut) = colorImg;
+	//line(colorImg,Point(ystart,0),Point(ystart,image.rows-1),Scalar (0,128,255),3);  //in BGR  order
+	//putText(colorImg, txt, Point(50,50),FONT_HERSHEY_TRIPLEX, 2, Scalar(0,255,180),5);
+	
+	//*((Mat*) addrOut) = colorImg;
+	return env->NewStringUTF((const char*)temp.c_str());
 }
 
 

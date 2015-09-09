@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_example_haveimgfun_LibImgFun
  * Method:    processImg
- * Signature: (JJ)V
+ * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT void JNICALL Java_com_example_haveimgfun_LibImgFun_processImg
-  (JNIEnv *, jobject, jlong, jlong);
+JNIEXPORT jstring JNICALL Java_com_example_haveimgfun_LibImgFun_processImg
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

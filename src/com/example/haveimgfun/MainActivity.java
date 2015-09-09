@@ -5,9 +5,14 @@ import java.io.File;
 import org.opencv.android.BaseLoaderCallback;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,7 +30,10 @@ import android.widget.TextView;
 import org.opencv.android.LoaderCallbackInterface;  
 import org.opencv.android.OpenCVLoader;  
 import org.opencv.android.Utils;  
+import org.opencv.core.Core;
 import org.opencv.core.Mat;  
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 
 import com.example.haveimgfun.R;
 
@@ -102,20 +110,26 @@ public class MainActivity extends Activity {
 			//process image
 			case R.id.button_process:
 				Mat rgbMat = new Mat();
-				Mat resultMat = new Mat();
-				
 				Utils.bitmapToMat(bmp, rgbMat); 
 				text.setText("row: "+rgbMat.rows()+" col:"+rgbMat.cols()+" channels: "+rgbMat.channels());
-				//load c++
-				LibImgFun libimagefun = new LibImgFun();			
-				libimagefun.processImg(rgbMat.getNativeObjAddr(),resultMat.getNativeObjAddr());
-		
-				Utils.matToBitmap(resultMat, bmp); 
-	            image.setImageBitmap(bmp);	            
+				
+				//c++ process
+				LibImgFun libimagefun = new LibImgFun();
+				String tmp = libimagefun.processImg(rgbMat.getNativeObjAddr()); //tmp="count;line;"
+			    
+				//string split
+				String [] strs = tmp.split("[;]"); 
+			    int count = Integer.parseInt(strs[0]);
+			    int column = Integer.parseInt(strs[1]);
+			    Log.i("TAG","count:"+count+" colum:"+column);
+				text.setText(tmp);
+				
+				//draw line
+				Core.line(rgbMat, new Point(column,0), new Point(column,rgbMat.height()), new Scalar(0,0,255),3);
+				Utils.matToBitmap(rgbMat, bmp);
+				image.setImageBitmap(bmp);
 	            //release mat
-	            rgbMat.release();
-	            resultMat.release();
-	            break;
+	            rgbMat.release(); ;
 	        //take photo    
 			case R.id.button_shot:
 				File file = new File(Environment.getExternalStorageDirectory(),"shot.jpg");
@@ -134,6 +148,7 @@ public class MainActivity extends Activity {
 		}
 	}
 	
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

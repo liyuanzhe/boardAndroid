@@ -5,5 +5,5 @@ public class LibImgFun {
 		System.loadLibrary("ImgFun");
 	}
 
-	public native void processImg(long matAddrInRGBA, long matAddroutInRGBA);
+	public native String processImg(long matAddrInRGBA);
 }
